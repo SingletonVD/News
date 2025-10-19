@@ -1,4 +1,4 @@
-package com.singletonv.news.ui.theme
+package com.singletonv.news.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

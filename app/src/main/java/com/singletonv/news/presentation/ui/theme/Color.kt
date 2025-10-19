@@ -1,4 +1,4 @@
-package com.singletonv.news.ui.theme
+package com.singletonv.news.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
