@@ -5,14 +5,16 @@
     <string name="clear_articles">Clear articles</string>
     <string name="settings_screen">Settings screen</string>
     <string name="remove_subscription">Remove subscription</string>
-    <string name="what_intersets_you">What intersets you?</string>
+    <string name="what_interests_you">What interests you?</string>
     <string name="add_subscription">Add subscription</string>
     <string name="add_subscription_button">Add subscription</string>
-    <string name="subscriptions_label">Subscriptions (%1$d</string>
+    <string name="subscriptions_label">Subscriptions (%1$d)</string>
     <string name="no_subscriptions">No subscriptions</string>
     <string name="image_for_article_label">Image for article %1$s</string>
     <string name="read_article_label">Read article %1$s</string>
     <string name="read">Read</string>
     <string name="share_article_label">Share article %1$s</string>
     <string name="share">Share</string>
+    <string name="articles_label">Articles (%1$d)</string>
+    <string name="no_articles_for_selected_subscriptions">No articles for selected subscriptions</string>
 </resources>
