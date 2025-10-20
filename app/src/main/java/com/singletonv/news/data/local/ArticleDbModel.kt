@@ -2,6 +2,7 @@ package com.singletonv.news.data.local
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 
 @Entity(
     tableName = "articles",
@@ -13,6 +14,9 @@ import androidx.room.ForeignKey
             childColumns = ["topic"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index("topic")
     ]
 )
 data class ArticleDbModel(
