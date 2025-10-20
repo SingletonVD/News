@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.converter.kotlinx.serialization)
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)
