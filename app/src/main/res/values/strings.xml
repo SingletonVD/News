@@ -20,4 +20,10 @@
     <string name="new_articles">New articles</string>
     <string name="new_articles_notification_title">New articles</string>
     <string name="update_subscriptions_notification">Update %1$d subscriptions: %2$s</string>
+    <string name="english">English</string>
+    <string name="russian">Russian</string>
+    <string name="french">French</string>
+    <string name="german">German</string>
+    <string name="settings_hours_label">%1$d hours</string>
+    <string name="settings_minutes_label">%1$d minutes</string>
 </resources>
