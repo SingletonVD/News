@@ -12,9 +12,11 @@ import com.singletonv.news.data.local.NewsDao
 import com.singletonv.news.data.local.SubscriptionDbModel
 import com.singletonv.news.data.mapper.toDbModel
 import com.singletonv.news.data.mapper.toEntities
+import com.singletonv.news.data.mapper.toQueryParam
 import com.singletonv.news.data.mapper.toRefreshConfig
 import com.singletonv.news.data.remote.NewsApiService
 import com.singletonv.news.domain.entity.Article
+import com.singletonv.news.domain.entity.Language
 import com.singletonv.news.domain.entity.RefreshConfig
 import com.singletonv.news.domain.repository.NewsRepository
 import kotlinx.coroutines.CancellationException
@@ -42,24 +44,31 @@ class NewsRepositoryImpl @Inject constructor(
         newsDao.addSubscription(SubscriptionDbModel(topic))
     }
 
-    override suspend fun updateArticlesForTopic(topic: String) {
-        val articles = loadArticles(topic)
-        newsDao.addArticles(articles)
+    override suspend fun updateArticlesForTopic(topic: String, language: Language): Boolean {
+        val articles = loadArticles(topic, language)
+        val ids = newsDao.addArticles(articles)
+        return ids.any { it != -1L }
     }
 
     override suspend fun removeSubscriptions(topic: String) {
         newsDao.deleteSubscription(SubscriptionDbModel(topic))
     }
 
-    override suspend fun updateArticlesForAllSubscriptions() {
+    override suspend fun updateArticlesForAllSubscriptions(language: Language): List<String> {
+        val updatedTopics = mutableListOf<String>()
         val subscriptions = newsDao.getAllSubscriptions().first()
         coroutineScope {
             subscriptions.forEach {
                 launch {
-                    updateArticlesForTopic(it.topic)
+                    val updated = updateArticlesForTopic(it.topic, language)
+                    if (updated) {
+                        updatedTopics.add(it.topic)
+                    }
                 }
             }
         }
+
+        return updatedTopics
     }
 
     override fun getArticlesByTopics(topics: List<String>): Flow<List<Article>> {
@@ -70,9 +79,9 @@ class NewsRepositoryImpl @Inject constructor(
         newsDao.deleteArticlesByTopics(topics)
     }
 
-    private suspend fun loadArticles(topic: String): List<ArticleDbModel> {
+    private suspend fun loadArticles(topic: String, language: Language): List<ArticleDbModel> {
         return try {
-            newsApiService.loadArticles(topic).toDbModel(topic)
+            newsApiService.loadArticles(topic, language.toQueryParam()).toDbModel(topic)
         } catch (e: Exception) {
             if (e is CancellationException) {
                 throw e

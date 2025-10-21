@@ -3,6 +3,7 @@ package com.singletonv.news.data.mapper
 import com.singletonv.news.data.local.ArticleDbModel
 import com.singletonv.news.data.remote.NewsResponseDto
 import com.singletonv.news.domain.entity.Article
+import com.singletonv.news.domain.entity.Language
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -31,6 +32,15 @@ fun List<ArticleDbModel>.toEntities(): List<Article> {
             url = it.url
         )
     }.distinct()
+}
+
+fun Language.toQueryParam(): String {
+    return when (this) {
+        Language.ENGLISH -> "en"
+        Language.RUSSIAN -> "ru"
+        Language.FRENCH -> "fr"
+        Language.GERMAN -> "de"
+    }
 }
 
 private fun String.toTimestamp(): Long {
