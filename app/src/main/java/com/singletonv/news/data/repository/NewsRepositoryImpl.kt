@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.util.Collections
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -55,7 +56,7 @@ class NewsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateArticlesForAllSubscriptions(language: Language): List<String> {
-        val updatedTopics = mutableListOf<String>()
+        val updatedTopics = Collections.synchronizedList(mutableListOf<String>())
         val subscriptions = newsDao.getAllSubscriptions().first()
         coroutineScope {
             subscriptions.forEach {
