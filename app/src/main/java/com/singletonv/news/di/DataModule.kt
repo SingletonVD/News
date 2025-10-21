@@ -1,11 +1,14 @@
 package com.singletonv.news.di
 
 import android.content.Context
+import androidx.work.WorkManager
 import com.singletonv.news.data.local.NewsDao
 import com.singletonv.news.data.local.NewsDatabase
 import com.singletonv.news.data.remote.NewsApiService
 import com.singletonv.news.data.repository.NewsRepositoryImpl
+import com.singletonv.news.data.repository.SettingsRepositoryImpl
 import com.singletonv.news.domain.repository.NewsRepository
+import com.singletonv.news.domain.repository.SettingsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -29,6 +32,12 @@ interface DataModule {
     fun bindNewsRepository(
         impl: NewsRepositoryImpl
     ): NewsRepository
+
+    @Singleton
+    @Binds
+    fun bindSettingsRepository(
+        impl: SettingsRepositoryImpl
+    ): SettingsRepository
 
     companion object {
 
@@ -75,5 +84,11 @@ interface DataModule {
                 .build()
             return retrofit.create<NewsApiService>()
         }
+
+        @Singleton
+        @Provides
+        fun provideWorkManager(
+            @ApplicationContext context: Context
+        ): WorkManager = WorkManager.getInstance(context)
     }
 }

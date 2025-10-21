@@ -1,13 +1,21 @@
 package com.singletonv.news.data.repository
 
 import android.util.Log
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.singletonv.news.data.background.RefreshDataWorker
 import com.singletonv.news.data.local.ArticleDbModel
 import com.singletonv.news.data.local.NewsDao
 import com.singletonv.news.data.local.SubscriptionDbModel
 import com.singletonv.news.data.mapper.toDbModel
 import com.singletonv.news.data.mapper.toEntities
+import com.singletonv.news.data.mapper.toRefreshConfig
 import com.singletonv.news.data.remote.NewsApiService
 import com.singletonv.news.domain.entity.Article
+import com.singletonv.news.domain.entity.RefreshConfig
 import com.singletonv.news.domain.repository.NewsRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.coroutineScope
@@ -15,11 +23,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class NewsRepositoryImpl @Inject constructor(
     private val newsDao: NewsDao,
-    private val newsApiService: NewsApiService
+    private val newsApiService: NewsApiService,
+    private val workManager: WorkManager
 ) : NewsRepository {
 
     override fun getAllSubscriptions(): Flow<List<String>> {
@@ -70,5 +80,31 @@ class NewsRepositoryImpl @Inject constructor(
             Log.e("NewsRepository", e.stackTraceToString())
             listOf()
         }
+    }
+
+    override fun startBackgroundRefresh(refreshConfig: RefreshConfig) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(
+                if (refreshConfig.wifiOnly) {
+                    NetworkType.UNMETERED
+                }
+                else {
+                    NetworkType.CONNECTED
+                }
+            )
+            .setRequiresBatteryNotLow(true)
+            .build()
+
+        val request = PeriodicWorkRequestBuilder<RefreshDataWorker>(
+            refreshConfig.interval.minutes.toLong(), TimeUnit.MINUTES
+        )
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueueUniquePeriodicWork(
+            uniqueWorkName = "Refresh data",
+            existingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            request = request
+        )
     }
 }
